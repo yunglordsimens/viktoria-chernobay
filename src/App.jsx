@@ -37,19 +37,17 @@ function LanguageSwitcher() {
 
   return (
     <div className="flex items-center gap-1 text-[11px] tracking-widest uppercase select-none">
-      <button
-        onClick={() => toggle('pl')}
-        className={`px-1 transition-colors ${current === 'pl' ? 'text-white font-bold' : 'text-neutral-600 hover:text-neutral-300'}`}
-      >
-        PL
-      </button>
-      <span className="text-neutral-700">|</span>
-      <button
-        onClick={() => toggle('en')}
-        className={`px-1 transition-colors ${current === 'en' ? 'text-white font-bold' : 'text-neutral-600 hover:text-neutral-300'}`}
-      >
-        EN
-      </button>
+      {['pl', 'en', 'ua'].map((lang, i, arr) => (
+        <React.Fragment key={lang}>
+          <button
+            onClick={() => toggle(lang)}
+            className={`px-1 transition-colors ${current === lang ? 'text-white font-bold' : 'text-neutral-600 hover:text-neutral-300'}`}
+          >
+            {lang.toUpperCase()}
+          </button>
+          {i < arr.length - 1 && <span className="text-neutral-700">|</span>}
+        </React.Fragment>
+      ))}
     </div>
   );
 }
