@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "portfolio": "Portfolio",
+    "about": "About",
+    "offer": "Services",
+    "reviews": "Reviews",
+    "contact": "Contact",
+    "reserve": "Book Now",
+    "reserveBtn": "Book a Session"
+  },
+  "hero": {
+    "tagline": "Real Estate & Architecture Photography",
+    "title": "FRAMES THAT\nSELL.",
+    "subtitle": "I help real estate agencies, developers and designers reveal the true potential of interiors. Professional imagery means faster sales and higher property value.",
+    "cta_portfolio": "View Portfolio",
+    "cta_offer": "See Packages"
+  },
+  "about": {
+    "label": "About me",
+    "title": "I visualise space\nto reveal its character.",
+    "p1": "I specialise in interior, architecture and premium real estate photography. My goal is not just to \"take a photo\" but to tell the story of a place so that it attracts the ideal client.",
+    "p2": "Through precise light control and careful post-processing I help agents, developers and interior designers build a strong brand in the industry.",
+    "stat1_value": "5+",
+    "stat1_label": "Years of Experience",
+    "stat2_value": "300+",
+    "stat2_label": "Properties Photographed"
+  },
+  "portfolio": {
+    "title": "Selected works",
+    "subtitle": "Frames that accelerated property sales and enhanced designers' portfolios.",
+    "tab_wnetrza": "Interiors",
+    "tab_design": "Design Projects",
+    "tab_architektura": "Architecture"
+  },
+  "pricing": {
+    "title": "Packages & Pricing",
+    "subtitle": "Transparent terms, no hidden costs.",
+    "popular": "Most popular",
+    "minimal_label": "Basic Package",
+    "minimal_name": "Minimal",
+    "minimal_f1": "Up to 20 edited photos",
+    "minimal_f2": "Ideal for small apartments up to 40 m²",
+    "optimal_label": "Standard Package",
+    "optimal_name": "Optimal",
+    "optimal_f1": "Up to 30 edited photos",
+    "optimal_f2": "Properties up to 80 m²",
+    "optimal_f3": "Detail-rich interiors",
+    "maximum_label": "Extended Package",
+    "maximum_name": "Maximum",
+    "maximum_f1": "Up to 40 edited photos",
+    "maximum_f2": "Spacious apartments up to 200 m²",
+    "designer_badge": "Special Offer for Designers",
+    "designer_name": "Designer Day",
+    "designer_desc": "Unlimited time on set until the perfect shot is achieved. Focus on details, textures and finish quality for an architectural portfolio.",
+    "designer_note": "* Promotional price, limited availability",
+    "designer_cta": "Book a Day"
+  },
+  "reviews": {
+    "title": "Trusted by professionals",
+    "subtitle": "See what my clients say about me."
+  },
+  "faq": {
+    "title": "FAQ & Terms of Cooperation",
+    "q1": "How long does a standard session take?",
+    "a1": "For an apartment up to 80m² a session usually takes about 1.5–2 hours. Larger homes or \"Designer Day\" sessions can last from 3 to 8 hours depending on requirements.",
+    "q2": "When will I receive the finished photos?",
+    "a2": "Professionally retouched photos are usually delivered within 48–72 hours of the client selecting the frames.",
+    "q3": "What usage rights do I receive?",
+    "a3": "You receive a licence to use the photos for promotional and property sales purposes (websites, listing portals, social media). Moral rights remain with me.",
+    "q4": "Do you offer drone photography?",
+    "a4": "Yes, I hold the required licences and offer drone photography, which perfectly complements the presentation of houses and plots. This option is available in the Premium package.",
+    "extra1_title": "Additional Shots",
+    "extra1_desc": "20 PLN / each shot beyond the package.",
+    "extra2_title": "Advanced Retouching",
+    "extra2_desc": "40 PLN / item (object removal, etc)."
+  },
+  "contact": {
+    "title": "Let's make a great project.",
+    "subtitle": "Book a session date or ask a question. I usually reply within 24 hours.",
+    "field_name": "Full Name / Company",
+    "field_name_ph": "John Smith",
+    "field_email": "Email",
+    "field_email_ph": "john@example.com",
+    "field_phone": "Phone",
+    "field_phone_ph": "+48 000 000 000",
+    "field_message": "Property Type / Message",
+    "field_message_ph": "Briefly describe your project (e.g. 60m² rental apartment, Warsaw)...",
+    "rodo": "I consent to the processing of my personal data for contact and query handling purposes. (GDPR)",
+    "submit": "Send Enquiry"
+  },
+  "footer": {
+    "rights": "© 2026 Photographer Name. All rights reserved.",
+    "tagline": "Designed for Real Estate"
+  }
+}
