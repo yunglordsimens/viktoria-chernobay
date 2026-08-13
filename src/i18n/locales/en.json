@@ -28,9 +28,9 @@
   "portfolio": {
     "title": "Selected works",
     "subtitle": "Frames that accelerated property sales and enhanced designers' portfolios.",
-    "tab_wnetrza": "Interiors",
-    "tab_design": "Design Projects",
-    "tab_architektura": "Architecture"
+    "tab_mieszkania": "Apartments",
+    "tab_domy": "Houses",
+    "tab_komercyjne": "Commercial Spaces"
   },
   "pricing": {
     "title": "Packages & Pricing",

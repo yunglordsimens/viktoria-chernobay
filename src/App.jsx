@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n/index.js';
@@ -8,6 +8,7 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronRight,
+  ChevronLeft,
   Menu,
   X,
   Star,
@@ -15,8 +16,9 @@ import {
   ChevronUp,
   Camera,
   Building,
+  Image as ImageIcon,
 } from 'lucide-react';
-import { portfolioItems } from './data/portfolio';
+import { portfolioItems, categories } from './data/portfolio';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -52,19 +54,71 @@ function LanguageSwitcher() {
   );
 }
 
+/* ─── SmartImage ────────────────────────────────────────────────
+   Pokazuje neutralny placeholder, dopóki plik nie istnieje.
+   Dzięki temu brak zdjęcia nie psuje layoutu.               */
+function SmartImage({ src, alt, className, fit = 'cover' }) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => setFailed(false), [src]);
+
+  if (failed) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-neutral-900`}>
+        <ImageIcon className="text-neutral-800 w-12 h-12" strokeWidth={1} />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailed(true)}
+      className={`${className} ${fit === 'contain' ? 'object-contain' : 'object-cover'}`}
+    />
+  );
+}
+
 /* ─── App ───────────────────────────────────────────────────── */
 export default function App() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('wnetrza');
+  const [activeTab, setActiveTab] = useState(categories[0].id);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [lightboxData, setLightboxData] = useState(null);
+  const [photoIndex, setPhotoIndex] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
 
-  const portfolioTabs = [
-    { id: 'wnetrza', label: t('portfolio.tab_wnetrza') },
-    { id: 'design', label: t('portfolio.tab_design') },
-    { id: 'architektura', label: t('portfolio.tab_architektura') },
-  ];
+  const portfolioTabs = categories.map((c) => ({ id: c.id, label: t(c.labelKey) }));
+
+  const openLightbox = (item) => {
+    setLightboxData(item);
+    setPhotoIndex(0);
+  };
+
+  const closeLightbox = useCallback(() => setLightboxData(null), []);
+
+  const step = useCallback((delta) => {
+    setPhotoIndex((prev) => {
+      const total = lightboxData?.images.length ?? 0;
+      if (!total) return 0;
+      return (prev + delta + total) % total;
+    });
+  }, [lightboxData]);
+
+  // Nawigacja klawiaturą w lightboxie
+  useEffect(() => {
+    if (!lightboxData) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') step(1);
+      if (e.key === 'ArrowLeft') step(-1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxData, closeLightbox, step]);
 
   const faqs = [
     { q: t('faq.q1'), a: t('faq.a1') },
@@ -224,21 +278,29 @@ export default function App() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              onClick={() => setLightboxData(item)}
+              onClick={() => openLightbox(item)}
               className={`relative group overflow-hidden rounded-xl bg-neutral-900 cursor-pointer ${item.aspect}`}
             >
-              <img
+              <SmartImage
                 src={item.src}
                 alt={item.title}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                className="absolute inset-0 w-full h-full group-hover:scale-105 transition-transform duration-700"
               />
+
+              {/* Licznik zdjęć w galerii */}
+              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm text-white/90 text-[10px] tracking-widest px-2.5 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <ImageIcon size={11} strokeWidth={1.5} /> {item.images.length}
+              </div>
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8">
                 <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <div className="flex items-center gap-2 text-neutral-400 text-[10px] tracking-widest uppercase mb-2">
                     <Building size={12} /> {item.type}
                   </div>
                   <h3 className="text-white text-xl font-light mb-1">{item.title}</h3>
-                  <p className="text-neutral-400 text-xs">{item.size} • {item.location}</p>
+                  <p className="text-neutral-400 text-xs">
+                    {[item.size, item.location, item.year].filter(Boolean).join(' • ')}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -249,19 +311,69 @@ export default function App() {
       {/* ── Lightbox ── */}
       {lightboxData && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 md:p-12 animate-fade-in">
-          <button onClick={() => setLightboxData(null)} className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
+          <button onClick={closeLightbox} className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-10">
             <X size={32} />
           </button>
+
           <div className="max-w-5xl w-full h-full flex flex-col items-center justify-center">
             <div className="relative w-full max-h-[70vh] aspect-[4/3] bg-neutral-900 flex items-center justify-center rounded-lg overflow-hidden">
-              <img src={lightboxData.src} alt={lightboxData.title} className="w-full h-full object-contain" />
+              <SmartImage
+                key={photoIndex}
+                src={lightboxData.images[photoIndex]}
+                alt={`${lightboxData.title} — ${photoIndex + 1}`}
+                fit="contain"
+                className="w-full h-full animate-fade-in"
+              />
+
+              {lightboxData.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => step(-1)}
+                    aria-label="Poprzednie zdjęcie"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/70 flex items-center justify-center transition-all"
+                  >
+                    <ChevronLeft size={22} />
+                  </button>
+                  <button
+                    onClick={() => step(1)}
+                    aria-label="Następne zdjęcie"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/70 flex items-center justify-center transition-all"
+                  >
+                    <ChevronRight size={22} />
+                  </button>
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white/80 text-[11px] tracking-widest px-3 py-1 rounded-full">
+                    {photoIndex + 1} / {lightboxData.images.length}
+                  </div>
+                </>
+              )}
             </div>
+
+            {/* Miniatury */}
+            {lightboxData.images.length > 1 && (
+              <div className="flex gap-2 mt-4 overflow-x-auto max-w-full pb-1">
+                {lightboxData.images.map((img, i) => (
+                  <button
+                    key={img}
+                    onClick={() => setPhotoIndex(i)}
+                    className={`shrink-0 w-16 h-12 rounded overflow-hidden border transition-all ${i === photoIndex ? 'border-white opacity-100' : 'border-transparent opacity-40 hover:opacity-75'}`}
+                  >
+                    <SmartImage src={img} alt="" className="w-full h-full" />
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="mt-8 text-center">
               <h3 className="text-2xl font-light text-white mb-2">{lightboxData.title}</h3>
               <div className="flex gap-4 justify-center text-sm text-neutral-400">
-                <span>{lightboxData.type}</span><span>•</span>
-                <span>{lightboxData.size}</span><span>•</span>
-                <span>{lightboxData.location}</span>
+                {[lightboxData.type, lightboxData.size, lightboxData.location, lightboxData.year]
+                  .filter(Boolean)
+                  .map((val, i, arr) => (
+                    <React.Fragment key={val}>
+                      <span>{val}</span>
+                      {i < arr.length - 1 && <span>•</span>}
+                    </React.Fragment>
+                  ))}
               </div>
             </div>
           </div>

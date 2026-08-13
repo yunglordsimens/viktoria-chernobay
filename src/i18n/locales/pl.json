@@ -28,9 +28,9 @@
   "portfolio": {
     "title": "Wybrane prace",
     "subtitle": "Kadry, które przyspieszyły sprzedaż nieruchomości i uświetniły portfolio projektantów.",
-    "tab_wnetrza": "Wnętrza",
-    "tab_design": "Projekty Designerskie",
-    "tab_architektura": "Architektura"
+    "tab_mieszkania": "Mieszkania",
+    "tab_domy": "Domy",
+    "tab_komercyjne": "Przestrzenie Komercyjne"
   },
   "pricing": {
     "title": "Pakiety i Cennik",
