@@ -19,6 +19,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { portfolioItems, categories } from './data/portfolio';
+import { testimonials } from './data/testimonials';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -93,6 +94,9 @@ export default function App() {
 
   const portfolioTabs = categories.map((c) => ({ id: c.id, label: t(c.labelKey) }));
 
+  // Sekcja "Opinie" i jej link w menu pojawiają się dopiero, gdy są prawdziwe opinie.
+  const hasTestimonials = testimonials.length > 0;
+
   const openLightbox = (item) => {
     setLightboxData(item);
     setPhotoIndex(0);
@@ -137,12 +141,6 @@ export default function App() {
     { q: t('faq.q4'), a: t('faq.a4') },
   ];
 
-  const testimonials = [
-    { id: 1, name: 'Anna Kowalska', role: 'Agent Nieruchomości, Premium Real Estate', text: 'Zdjęcia wykonane dla naszego apartamentu na Złotej 44 przeszły najśmielsze oczekiwania. Nieruchomość sprzedała się w 2 tygodnie.' },
-    { id: 2, name: 'Michał Nowak', role: 'Architekt Wnętrz', text: 'Sesja "Designer Day" to strzał w dziesiątkę. Fotograf doskonale zrozumiał moją wizję i uchwycił detale, nad którymi pracowałem miesiącami.' },
-    { id: 3, name: 'Piotr Wiśniewski', role: 'Inwestor (Flip Mieszkań)', text: 'Od kiedy współpracujemy, moje mieszkania na wynajem znikają z portali w pierwszy dzień od publikacji ogłoszenia. Rewelacyjna jakość!' },
-  ];
-
   const filteredPortfolio = portfolioItems.filter(item => item.category === activeTab);
 
   return (
@@ -161,7 +159,7 @@ export default function App() {
             <a href="#portfolio" className="hover:text-white transition-colors">{t('nav.portfolio')}</a>
             <a href="#o-mnie" className="hover:text-white transition-colors">{t('nav.about')}</a>
             <a href="#oferta" className="hover:text-white transition-colors">{t('nav.offer')}</a>
-            <a href="#opinie" className="hover:text-white transition-colors">{t('nav.reviews')}</a>
+            {hasTestimonials && <a href="#opinie" className="hover:text-white transition-colors">{t('nav.reviews')}</a>}
             <a href="#kontakt" className="hover:text-white transition-colors">{t('nav.contact')}</a>
           </div>
 
@@ -186,7 +184,7 @@ export default function App() {
           <a href="#portfolio" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.portfolio')}</a>
           <a href="#o-mnie" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.about')}</a>
           <a href="#oferta" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.offer')}</a>
-          <a href="#opinie" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.reviews')}</a>
+          {hasTestimonials && <a href="#opinie" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.reviews')}</a>}
           <a href="#kontakt" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.contact')}</a>
           <LanguageSwitcher />
           <a href="#kontakt" onClick={() => setIsMobileMenuOpen(false)} className="mt-4 px-8 py-3 border border-white text-white tracking-widest uppercase text-sm hover:bg-white hover:text-black transition-colors">
@@ -475,7 +473,8 @@ export default function App() {
         </div>
       </motion.section>
 
-      {/* ── Opinie ── */}
+      {/* ── Opinie — renderuje się tylko, gdy są prawdziwe opinie ── */}
+      {hasTestimonials && (
       <motion.section id="opinie" {...fadeInUp} className="py-24 px-6 md:px-12 bg-neutral-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -499,6 +498,7 @@ export default function App() {
           </div>
         </div>
       </motion.section>
+      )}
 
       {/* ── FAQ ── */}
       <motion.section {...fadeInUp} className="py-24 px-6 md:px-12 border-t border-white/5 bg-neutral-900/30">
