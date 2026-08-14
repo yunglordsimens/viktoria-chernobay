@@ -224,7 +224,11 @@ export default function App() {
       <motion.section id="o-mnie" {...fadeInUp} className="py-24 md:py-32 px-6 md:px-12">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative aspect-[3/4] md:aspect-square bg-neutral-900 rounded-2xl overflow-hidden group">
-            <img src="/images/about.jpg" alt="Fotograf" className="absolute inset-0 w-full h-full object-cover" />
+            <SmartImage
+              src="/images/about/viktoria-chernobay.webp"
+              alt="Viktoria Chernobay"
+              className="absolute inset-0 w-full h-full"
+            />
           </div>
           <div className="space-y-8">
             <div className="text-[10px] tracking-widest text-neutral-500 uppercase">{t('about.label')}</div>

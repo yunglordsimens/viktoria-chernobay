@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "portfolio": "node scripts/generate-portfolio.mjs",
+    "dev": "npm run portfolio && vite",
+    "build": "npm run portfolio && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
