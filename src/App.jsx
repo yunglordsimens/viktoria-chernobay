@@ -120,6 +120,16 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [lightboxData, closeLightbox, step]);
 
+  const packages = [
+    { id: 'minimal', price: '300', features: ['pricing.minimal_f1', 'pricing.minimal_f2'] },
+    { id: 'optimal', price: '400', popular: true, features: ['pricing.optimal_f1', 'pricing.optimal_f2', 'pricing.optimal_f3'] },
+    { id: 'maximum', price: '500', features: ['pricing.maximum_f1', 'pricing.maximum_f2'] },
+    { id: 'premium', price: null, features: ['pricing.premium_f1', 'pricing.premium_f2', 'pricing.premium_f3'] },
+  ];
+
+  // Warunki współpracy — pełna lista z oferty
+  const terms = Array.from({ length: 10 }, (_, i) => t(`faq.t${i + 1}`));
+
   const faqs = [
     { q: t('faq.q1'), a: t('faq.a1') },
     { q: t('faq.q2'), a: t('faq.a2') },
@@ -392,44 +402,50 @@ export default function App() {
             <p className="text-sm text-neutral-500 font-light">{t('pricing.subtitle')}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Minimal */}
-            <div className="bg-neutral-950 border border-white/5 p-8 rounded-2xl hover:border-white/20 transition-colors flex flex-col group">
-              <div className="text-[10px] tracking-widest text-neutral-500 uppercase mb-4">{t('pricing.minimal_label')}</div>
-              <h3 className="text-2xl text-white font-light mb-2">{t('pricing.minimal_name')}</h3>
-              <div className="text-4xl font-light text-white mb-8 group-hover:scale-105 transition-transform origin-left">300 <span className="text-lg text-neutral-600">PLN</span></div>
-              <ul className="space-y-4 text-sm font-light flex-1">
-                <li className="flex gap-3"><CheckCircle2 size={18} className="text-neutral-600 shrink-0" />{t('pricing.minimal_f1')}</li>
-                <li className="flex gap-3"><CheckCircle2 size={18} className="text-neutral-600 shrink-0" />{t('pricing.minimal_f2')}</li>
-              </ul>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`p-8 rounded-2xl transition-colors flex flex-col relative group ${
+                  pkg.popular
+                    ? 'bg-neutral-900 border border-neutral-700 hover:border-neutral-500 shadow-2xl lg:-translate-y-4'
+                    : 'bg-neutral-950 border border-white/5 hover:border-white/20'
+                }`}
+              >
+                {pkg.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-1 rounded-full text-[10px] tracking-widest uppercase font-bold whitespace-nowrap">
+                    {t('pricing.popular')}
+                  </div>
+                )}
 
-            {/* Optimal */}
-            <div className="bg-neutral-900 border border-neutral-700 p-8 rounded-2xl hover:border-neutral-500 transition-colors flex flex-col relative transform md:-translate-y-4 shadow-2xl group">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-1 rounded-full text-[10px] tracking-widest uppercase font-bold">
-                {t('pricing.popular')}
+                <div className={`text-[10px] tracking-widest uppercase mb-4 ${pkg.popular ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  {t(`pricing.${pkg.id}_label`)}
+                </div>
+                <h3 className="text-2xl text-white font-light mb-2">{t(`pricing.${pkg.id}_name`)}</h3>
+
+                <div className="text-4xl font-light text-white mb-8 group-hover:scale-105 transition-transform origin-left">
+                  {pkg.price ? (
+                    <>{pkg.price} <span className="text-lg text-neutral-600">PLN</span></>
+                  ) : (
+                    <span className="text-2xl text-neutral-300">{t('pricing.custom_quote')}</span>
+                  )}
+                </div>
+
+                <ul className="space-y-4 text-sm font-light flex-1">
+                  {pkg.features.map((key) => (
+                    <li key={key} className={`flex gap-3 ${pkg.popular ? 'text-white' : ''}`}>
+                      <CheckCircle2 size={18} className={`shrink-0 ${pkg.popular ? 'text-white' : 'text-neutral-600'}`} />
+                      {t(key)}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="text-[10px] tracking-widest text-neutral-400 uppercase mb-4">{t('pricing.optimal_label')}</div>
-              <h3 className="text-2xl text-white font-light mb-2">{t('pricing.optimal_name')}</h3>
-              <div className="text-4xl font-light text-white mb-8 group-hover:scale-105 transition-transform origin-left">400 <span className="text-lg text-neutral-500">PLN</span></div>
-              <ul className="space-y-4 text-sm font-light flex-1">
-                <li className="flex gap-3 text-white"><CheckCircle2 size={18} className="text-white shrink-0" />{t('pricing.optimal_f1')}</li>
-                <li className="flex gap-3"><CheckCircle2 size={18} className="text-neutral-500 shrink-0" />{t('pricing.optimal_f2')}</li>
-                <li className="flex gap-3"><CheckCircle2 size={18} className="text-neutral-500 shrink-0" />{t('pricing.optimal_f3')}</li>
-              </ul>
-            </div>
-
-            {/* Maximum */}
-            <div className="bg-neutral-950 border border-white/5 p-8 rounded-2xl hover:border-white/20 transition-colors flex flex-col group">
-              <div className="text-[10px] tracking-widest text-neutral-500 uppercase mb-4">{t('pricing.maximum_label')}</div>
-              <h3 className="text-2xl text-white font-light mb-2">{t('pricing.maximum_name')}</h3>
-              <div className="text-4xl font-light text-white mb-8 group-hover:scale-105 transition-transform origin-left">500 <span className="text-lg text-neutral-600">PLN</span></div>
-              <ul className="space-y-4 text-sm font-light flex-1">
-                <li className="flex gap-3"><CheckCircle2 size={18} className="text-neutral-600 shrink-0" />{t('pricing.maximum_f1')}</li>
-                <li className="flex gap-3"><CheckCircle2 size={18} className="text-neutral-600 shrink-0" />{t('pricing.maximum_f2')}</li>
-              </ul>
-            </div>
+            ))}
           </div>
+
+          <p className="text-center text-[10px] tracking-widest uppercase text-neutral-600 mb-6">
+            {t('pricing.netto')}
+          </p>
 
           {/* Designer Day */}
           <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 mt-6 overflow-hidden relative">
@@ -439,9 +455,14 @@ export default function App() {
                 {t('pricing.designer_badge')}
               </div>
               <h3 className="text-3xl md:text-4xl font-light text-white mb-4">{t('pricing.designer_name')}</h3>
-              <div className="text-neutral-400 font-light text-sm max-w-md space-y-2">
-                <p>{t('pricing.designer_desc')}</p>
-              </div>
+              <ul className="text-neutral-400 font-light text-sm max-w-md space-y-3">
+                {['designer_f1', 'designer_f2', 'designer_f3'].map((k) => (
+                  <li key={k} className="flex gap-3">
+                    <CheckCircle2 size={18} className="text-neutral-600 shrink-0 mt-0.5" />
+                    {t(`pricing.${k}`)}
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="text-left md:text-right shrink-0 w-full md:w-auto relative z-10">
               <div className="text-5xl font-light text-white mb-2">500 <span className="text-xl">PLN*</span></div>
@@ -498,16 +519,19 @@ export default function App() {
                 </div>
               </div>
             ))}
-            <div className="border border-white/10 bg-neutral-950 rounded-xl p-6 flex flex-col sm:flex-row justify-between gap-4 text-sm text-neutral-400 font-light mt-8">
-              <div>
-                <p className="text-white mb-1">{t('faq.extra1_title')}</p>
-                <p>{t('faq.extra1_desc')}</p>
-              </div>
-              <div className="sm:text-right">
-                <p className="text-white mb-1">{t('faq.extra2_title')}</p>
-                <p>{t('faq.extra2_desc')}</p>
-              </div>
-            </div>
+          </div>
+
+          {/* Warunki współpracy */}
+          <div className="border border-white/10 bg-neutral-950 rounded-xl p-6 md:p-8 mt-8">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white mb-6">{t('faq.terms_title')}</p>
+            <ul className="space-y-4 text-sm text-neutral-400 font-light">
+              {terms.map((term, i) => (
+                <li key={i} className="flex gap-3 leading-relaxed">
+                  <span className="text-neutral-700 shrink-0 select-none">—</span>
+                  {term}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </motion.section>
