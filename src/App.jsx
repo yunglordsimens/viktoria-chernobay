@@ -148,7 +148,7 @@ export default function App() {
 
       {/* ── Navbar ── */}
       <nav className="fixed w-full top-0 z-50 bg-neutral-950/70 backdrop-blur-xl border-b border-white/5 transition-all">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-site mx-auto px-6 h-20 flex items-center justify-between">
           <a href="#" className="text-sm tracking-[0.2em] text-white uppercase flex flex-col z-50">
             <span className="font-bold">Photographer</span>
             <span className="text-[10px] text-neutral-500">Name</span>
@@ -204,13 +204,13 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/40 via-neutral-950/70 to-neutral-950 z-10" />
         </div>
 
-        <div className="relative z-20 space-y-8 max-w-4xl mx-auto animate-fade-in-up">
+        <div className="relative z-20 space-y-8 max-w-site-narrow mx-auto animate-fade-in-up">
           <div className="text-neutral-400 tracking-[0.4em] text-[10px] md:text-xs uppercase flex items-center justify-center gap-4">
             <span className="w-8 h-[1px] bg-neutral-600"></span>
             {t('hero.tagline')}
             <span className="w-8 h-[1px] bg-neutral-600"></span>
           </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white tracking-tighter leading-[1.1] whitespace-pre-line">
+          <h1 className="text-hero font-light text-white whitespace-pre-line">
             {t('hero.title')}
           </h1>
           <p className="text-sm md:text-base text-neutral-400 font-light max-w-lg mx-auto leading-relaxed">
@@ -229,7 +229,7 @@ export default function App() {
       </section>
 
       {/* ── O mnie ── */}
-      <motion.section id="o-mnie" {...fadeInUp} className="py-24 md:py-32 px-6 md:px-12">
+      <motion.section id="o-mnie" {...fadeInUp} className="py-24 md:py-32 px-6 md:px-12 2xl:px-16">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative aspect-[3/4] md:aspect-square bg-neutral-900 rounded-2xl overflow-hidden group">
             <SmartImage
@@ -240,7 +240,7 @@ export default function App() {
           </div>
           <div className="space-y-8">
             <div className="text-[10px] tracking-widest text-neutral-500 uppercase">{t('about.label')}</div>
-            <h2 className="text-3xl md:text-5xl font-light text-white tracking-tight leading-tight whitespace-pre-line">
+            <h2 className="text-display font-light text-white leading-tight whitespace-pre-line">
               {t('about.title')}
             </h2>
             <div className="space-y-4 text-sm text-neutral-400 font-light leading-relaxed">
@@ -264,9 +264,9 @@ export default function App() {
 
       {/* ── Portfolio ── */}
       <motion.section id="portfolio" {...fadeInUp} className="py-24 md:py-32 overflow-hidden bg-neutral-900/30">
-        <div className="px-6 md:px-12 max-w-7xl mx-auto mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="px-6 md:px-12 2xl:px-16 max-w-site mx-auto mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
-            <h2 className="text-3xl md:text-5xl font-light text-white tracking-tight mb-4">{t('portfolio.title')}</h2>
+            <h2 className="text-display font-light text-white mb-4">{t('portfolio.title')}</h2>
             <p className="text-sm text-neutral-500 font-light max-w-sm">{t('portfolio.subtitle')}</p>
           </div>
 
@@ -283,7 +283,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 px-6 md:px-12 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-8 px-6 md:px-12 2xl:px-16 max-w-site mx-auto">
           {filteredPortfolio.map((item, index) => (
             <motion.div
               key={item.id}
@@ -300,12 +300,13 @@ export default function App() {
               />
 
               {/* Licznik zdjęć w galerii */}
-              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm text-white/90 text-[10px] tracking-widest px-2.5 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              {/* Na dotyku nie ma hovera — na małych ekranach opis jest widoczny od razu. */}
+              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm text-white/90 text-[10px] tracking-widest px-2.5 py-1 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500">
                 <ImageIcon size={11} strokeWidth={1.5} /> {item.images.length}
               </div>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8">
-                <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8">
+                <div className="transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500">
                   <div className="flex items-center gap-2 text-neutral-400 text-[10px] tracking-widest uppercase mb-2">
                     <Building size={12} /> {item.type}
                   </div>
@@ -328,7 +329,7 @@ export default function App() {
           </button>
 
           <div className="max-w-5xl w-full h-full flex flex-col items-center justify-center">
-            <div className="relative w-full max-h-[70vh] aspect-[4/3] bg-neutral-900 flex items-center justify-center rounded-lg overflow-hidden">
+            <div className="relative w-full max-h-[52vh] sm:max-h-[62vh] md:max-h-[70vh] aspect-[4/3] bg-neutral-900 flex items-center justify-center rounded-lg overflow-hidden">
               <SmartImage
                 key={photoIndex}
                 src={lightboxData.images[photoIndex]}
@@ -367,7 +368,7 @@ export default function App() {
                   <button
                     key={img}
                     onClick={() => setPhotoIndex(i)}
-                    className={`shrink-0 w-16 h-12 rounded overflow-hidden border transition-all ${i === photoIndex ? 'border-white opacity-100' : 'border-transparent opacity-40 hover:opacity-75'}`}
+                    className={`shrink-0 w-12 h-9 sm:w-16 sm:h-12 rounded overflow-hidden border transition-all ${i === photoIndex ? 'border-white opacity-100' : 'border-transparent opacity-40 hover:opacity-75'}`}
                   >
                     <SmartImage src={img} alt="" className="w-full h-full" />
                   </button>
@@ -375,8 +376,8 @@ export default function App() {
               </div>
             )}
 
-            <div className="mt-8 text-center">
-              <h3 className="text-2xl font-light text-white mb-2">{lightboxData.title}</h3>
+            <div className="mt-5 md:mt-8 text-center">
+              <h3 className="text-xl md:text-2xl font-light text-white mb-2">{lightboxData.title}</h3>
               <div className="flex gap-4 justify-center text-sm text-neutral-400">
                 {[lightboxData.type, lightboxData.size, lightboxData.location, lightboxData.year]
                   .filter(Boolean)
@@ -393,10 +394,10 @@ export default function App() {
       )}
 
       {/* ── Oferta ── */}
-      <motion.section id="oferta" {...fadeInUp} className="py-24 px-6 md:px-12 bg-neutral-900/50">
-        <div className="max-w-7xl mx-auto">
+      <motion.section id="oferta" {...fadeInUp} className="py-24 px-6 md:px-12 2xl:px-16 bg-neutral-900/50">
+        <div className="max-w-site mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-light text-white tracking-tight mb-4">{t('pricing.title')}</h2>
+            <h2 className="text-display font-light text-white mb-4">{t('pricing.title')}</h2>
             <p className="text-sm text-neutral-500 font-light">{t('pricing.subtitle')}</p>
           </div>
 
@@ -475,10 +476,10 @@ export default function App() {
 
       {/* ── Opinie — renderuje się tylko, gdy są prawdziwe opinie ── */}
       {hasTestimonials && (
-      <motion.section id="opinie" {...fadeInUp} className="py-24 px-6 md:px-12 bg-neutral-950">
-        <div className="max-w-7xl mx-auto">
+      <motion.section id="opinie" {...fadeInUp} className="py-24 px-6 md:px-12 2xl:px-16 bg-neutral-950">
+        <div className="max-w-site mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-light text-white tracking-tight mb-4">{t('reviews.title')}</h2>
+            <h2 className="text-display font-light text-white mb-4">{t('reviews.title')}</h2>
             <p className="text-sm text-neutral-500 font-light">{t('reviews.subtitle')}</p>
           </div>
 
@@ -501,7 +502,7 @@ export default function App() {
       )}
 
       {/* ── FAQ ── */}
-      <motion.section {...fadeInUp} className="py-24 px-6 md:px-12 border-t border-white/5 bg-neutral-900/30">
+      <motion.section {...fadeInUp} className="py-24 px-6 md:px-12 2xl:px-16 border-t border-white/5 bg-neutral-900/30">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-sm tracking-[0.2em] uppercase text-white mb-12 text-center">{t('faq.title')}</h2>
           <div className="space-y-4">
@@ -537,7 +538,7 @@ export default function App() {
       </motion.section>
 
       {/* ── Kontakt ── */}
-      <motion.section id="kontakt" {...fadeInUp} className="pt-24 pb-12 px-6 md:px-12 bg-neutral-900 rounded-t-[3rem] md:rounded-t-[6rem] mx-2 md:mx-6 mb-2">
+      <motion.section id="kontakt" {...fadeInUp} className="pt-24 pb-12 px-6 md:px-12 2xl:px-16 bg-neutral-900 rounded-t-[3rem] md:rounded-t-[6rem] mx-2 md:mx-6 mb-2">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
             <div className="space-y-8">
