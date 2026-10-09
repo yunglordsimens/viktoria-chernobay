@@ -8,20 +8,20 @@
     @apply bg-plaster text-graphite font-sans antialiased;
     font-feature-settings: 'ss01';
   }
-  :focus-visible { outline: 2px solid #A8844C; outline-offset: 3px; }
-  ::selection { background: #0F1D26; color: #ECEDEA; }
+  :focus-visible { outline: 2px solid #A87A52; outline-offset: 3px; }
+  ::selection { background: #3A302A; color: #EFE9E1; }
 }
 
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 text-[13px] font-medium tracking-wide rounded-[2px] transition-colors;
   }
-  .btn-light { @apply btn bg-plaster text-bay hover:bg-white; }
-  .btn-dark { @apply btn bg-bay text-plaster hover:bg-graphite; }
+  .btn-light { @apply btn bg-plaster text-ink hover:bg-white; }
+  .btn-dark { @apply btn bg-ink text-plaster hover:bg-graphite; }
   .btn-ghost-light { @apply btn border border-plaster/40 text-plaster hover:border-plaster hover:bg-plaster/10; }
-  .btn-ghost-dark { @apply btn border border-bay/30 text-bay hover:border-bay; }
+  .btn-ghost-dark { @apply btn border border-ink/30 text-ink hover:border-ink; }
   .field {
-    @apply w-full bg-transparent border-0 border-b border-bay-line px-0 py-3 text-plaster placeholder:text-mist/70
+    @apply w-full bg-transparent border-0 border-b border-ink-line px-0 py-3 text-plaster placeholder:text-mist/70
       focus:border-brass-light focus:ring-0 focus:outline-none transition-colors;
   }
 }

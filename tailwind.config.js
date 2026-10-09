@@ -3,15 +3,15 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
-      // Black Bay — "nocna zatoka" + tynk ścian z jej zdjęć + mosiądz armatury.
-      colors: {
-        bay: { DEFAULT: '#0F1D26', line: '#2A3D49' },
-        plaster: '#ECEDEA',
-        paper: '#F6F6F4',
-        stone: '#C6CAC6',
-        graphite: '#3A454B',
-        mist: '#7F898D',
-        brass: { DEFAULT: '#A8844C', light: '#C9A56A' },
+            colors: {
+        // Paleta z portretu Viktorii: kremowa marynarka, ciepłe tło, karmelowe włosy.
+        ink: { DEFAULT: '#3A302A', line: '#5A4C42' },
+        plaster: '#EFE9E1',
+        paper: '#F8F5F0',
+        stone: '#DCD1C4',
+        graphite: '#4A3F37',
+        mist: '#8C7B70',
+        brass: { DEFAULT: '#A87A52', light: '#D2A884' },
       },
       fontFamily: {
         display: ['"Unbounded Variable"', 'Unbounded', 'system-ui', 'sans-serif'],
