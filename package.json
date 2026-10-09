@@ -6,7 +6,7 @@
   "scripts": {
     "portfolio": "node scripts/generate-portfolio.mjs",
     "dev": "npm run portfolio && vite",
-    "build": "npm run portfolio && vite build",
+    "build": "npm run portfolio && vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

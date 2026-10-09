@@ -6,7 +6,14 @@ export const site = {
   brand: 'Black Bay',
   brandSuffix: 'Studio',
   founder: 'Viktoria Chernobay',
+  // Inne zapisy imienia — żeby wyszukiwarki i AI łączyły je z jedną osobą.
+  founderAltNames: ['Wiktoria Czernobaj', 'Viktoriia Chernobai', 'Вікторія Чернобай', 'Виктория Чернобай'],
   city: 'Warszawa',
+  // Adres strony bez ukośnika na końcu. Po podpięciu własnej domeny zmień tylko tutaj.
+  url: 'https://viktoria-chernobay.vercel.app',
+  // Profile w sieci (Instagram, Facebook, LinkedIn, Google Maps, Houzz…) — pełne linki.
+  // Im więcej spójnych profili, tym szybciej Google i AI rozpoznają Viktorię.
+  sameAs: [],
   // TODO: prawdziwe dane kontaktowe Viktorii
   email: 'hello@blackbay.studio',
   phone: '',

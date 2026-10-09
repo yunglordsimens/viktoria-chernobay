@@ -343,7 +343,7 @@ export default function App() {
                 <div className="relative aspect-[4/5] overflow-hidden bg-stone/40">
                   <SmartImage
                     src={item.src}
-                    alt={item.title}
+                    alt={`${item.title}, ${item.location}, fot. ${site.founder}`}
                     className="absolute inset-0 w-full h-full transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                   />
                 </div>
@@ -381,7 +381,7 @@ export default function App() {
             <SmartImage
               key={photoIndex}
               src={lightbox.images[photoIndex]}
-              alt={`${lightbox.title}, ${photoIndex + 1}`}
+              alt={`${lightbox.title}, ${photoIndex + 1}, fot. ${site.founder}`}
               fit="contain"
               eager
               className="w-full h-full animate-fade-in"
@@ -523,7 +523,7 @@ export default function App() {
         <div className="max-w-site mx-auto grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <figure className="lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden bg-stone/40">
-              <SmartImage src="/images/about/viktoria-chernobay.webp" alt={site.founder} className="absolute inset-0 w-full h-full" />
+              <SmartImage src="/images/about/viktoria-chernobay.webp" alt={`${site.founder}, fotograf wnętrz, ${site.brand} ${site.brandSuffix}`} className="absolute inset-0 w-full h-full" />
             </div>
             <figcaption className="mt-4 flex justify-between gap-4 text-[14px]">
               <span className="font-display text-ink">{site.founder}</span>
