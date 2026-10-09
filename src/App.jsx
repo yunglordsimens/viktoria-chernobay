@@ -1,81 +1,62 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import i18n from './i18n/index.js';
-import {
-  Instagram,
-  Mail,
-  ArrowRight,
-  CheckCircle2,
-  ChevronRight,
-  ChevronLeft,
-  Menu,
-  X,
-  Star,
-  ChevronDown,
-  ChevronUp,
-  Camera,
-  Building,
-  Image as ImageIcon,
-} from 'lucide-react';
+import { Instagram, Mail, Phone, ChevronRight, ChevronLeft, Menu, X, Plus, Minus, Image as ImageIcon } from 'lucide-react';
 import { portfolioItems, categories } from './data/portfolio';
 import { testimonials } from './data/testimonials';
+import { site, packages, designerDayPrice, services, processSteps } from './data/site';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-50px' },
-  transition: { duration: 0.6, ease: 'easeOut' },
-};
+/* ─── Wordmark ─────────────────────────────────────────────── */
+function Wordmark({ className = '' }) {
+  return (
+    <span className={`font-display leading-none ${className}`}>
+      <span className="font-medium tracking-[-0.02em]">{site.brand}</span>
+      <span className="font-light opacity-60"> {site.brandSuffix}</span>
+    </span>
+  );
+}
 
 /* ─── Language Switcher ─────────────────────────────────────── */
-function LanguageSwitcher() {
-  const { i18n: i18nInstance } = useTranslation();
-  const current = i18nInstance.language;
-
-  const toggle = (lang) => {
-    i18nInstance.changeLanguage(lang);
-    localStorage.setItem('lang', lang);
+function LanguageSwitcher({ tone = 'light' }) {
+  const { i18n } = useTranslation();
+  const current = i18n.language;
+  const set = (lang) => {
+    i18n.changeLanguage(lang);
+    try { localStorage.setItem('lang', lang); } catch { /* prywatne okno */ }
   };
-
+  const idle = tone === 'light' ? 'text-plaster/50 hover:text-plaster' : 'text-mist hover:text-bay';
+  const active = tone === 'light' ? 'text-plaster' : 'text-bay';
   return (
-    <div className="flex items-center gap-1 text-[11px] tracking-widest uppercase select-none">
-      {['pl', 'en', 'ua'].map((lang, i, arr) => (
-        <React.Fragment key={lang}>
-          <button
-            onClick={() => toggle(lang)}
-            className={`px-1 transition-colors ${current === lang ? 'text-white font-bold' : 'text-neutral-600 hover:text-neutral-300'}`}
-          >
-            {lang.toUpperCase()}
-          </button>
-          {i < arr.length - 1 && <span className="text-neutral-700">|</span>}
-        </React.Fragment>
+    <div className="flex items-center gap-3 text-[12px] font-medium select-none">
+      {['pl', 'en', 'ua'].map((lang) => (
+        <button
+          key={lang}
+          onClick={() => set(lang)}
+          aria-pressed={current === lang}
+          className={`transition-colors ${current === lang ? `${active} underline underline-offset-4 decoration-brass` : idle}`}
+        >
+          {lang === 'ua' ? 'UA' : lang.toUpperCase()}
+        </button>
       ))}
     </div>
   );
 }
 
-/* ─── SmartImage ────────────────────────────────────────────────
-   Pokazuje neutralny placeholder, dopóki plik nie istnieje.
-   Dzięki temu brak zdjęcia nie psuje layoutu.               */
-function SmartImage({ src, alt, className, fit = 'cover' }) {
+/* ─── SmartImage ────────────────────────────────────────────── */
+function SmartImage({ src, alt, className = '', fit = 'cover', eager = false }) {
   const [failed, setFailed] = useState(false);
-
   useEffect(() => setFailed(false), [src]);
-
-  if (failed) {
+  if (failed || !src) {
     return (
-      <div className={`${className} flex items-center justify-center bg-neutral-900`}>
-        <ImageIcon className="text-neutral-800 w-12 h-12" strokeWidth={1} />
+      <div className={`${className} flex items-center justify-center bg-stone/40`}>
+        <ImageIcon className="text-mist w-10 h-10" strokeWidth={1} />
       </div>
     );
   }
-
   return (
     <img
       src={src}
       alt={alt}
-      loading="lazy"
+      loading={eager ? 'eager' : 'lazy'}
       decoding="async"
       onError={() => setFailed(true)}
       className={`${className} ${fit === 'contain' ? 'object-contain' : 'object-cover'}`}
@@ -83,38 +64,97 @@ function SmartImage({ src, alt, className, fit = 'cover' }) {
   );
 }
 
+/* ─── Viewfinder ───────────────────────────────────────────────
+   Ramka wizjera i siatka trójpodziału — język fotografa architektury.
+   Rysuje się raz przy wejściu na stronę.                        */
+function Viewfinder() {
+  const corner = 'absolute w-8 h-8 md:w-12 md:h-12 border-plaster/80';
+  return (
+    <div className="absolute inset-x-4 bottom-4 top-20 md:inset-x-8 md:bottom-8 md:top-28 pointer-events-none z-20" aria-hidden="true">
+      <span className={`${corner} top-0 left-0 border-t border-l`} />
+      <span className={`${corner} top-0 right-0 border-t border-r`} />
+      <span className={`${corner} bottom-0 left-0 border-b border-l`} />
+      <span className={`${corner} bottom-0 right-0 border-b border-r`} />
+      {[1, 2].map((i) => (
+        <span
+          key={`v${i}`}
+          className="absolute top-0 bottom-0 w-px bg-plaster/15 origin-top animate-draw-y"
+          style={{ left: `${(i * 100) / 3}%`, animationDelay: `${0.2 + i * 0.12}s` }}
+        />
+      ))}
+      {[1, 2].map((i) => (
+        <span
+          key={`h${i}`}
+          className="absolute left-0 right-0 h-px bg-plaster/15 origin-left animate-draw-x"
+          style={{ top: `${(i * 100) / 3}%`, animationDelay: `${0.45 + i * 0.12}s` }}
+        />
+      ))}
+      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5">
+        <span className="absolute left-1/2 top-0 bottom-0 w-px bg-plaster/60" />
+        <span className="absolute top-1/2 left-0 right-0 h-px bg-plaster/60" />
+      </span>
+    </div>
+  );
+}
+
+function SectionHead({ id, title, subtitle, tone = 'dark', children }) {
+  const titleColor = tone === 'dark' ? 'text-bay' : 'text-plaster';
+  const subColor = tone === 'dark' ? 'text-graphite/80' : 'text-plaster/60';
+  return (
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
+      <div>
+        <h2 id={id} className={`font-display font-light text-display ${titleColor}`}>{title}</h2>
+        {subtitle && <p className={`mt-4 max-w-prose text-[15px] leading-relaxed ${subColor}`}>{subtitle}</p>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+const pln = (n) => new Intl.NumberFormat('pl-PL').format(n);
+
 /* ─── App ───────────────────────────────────────────────────── */
 export default function App() {
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState(categories[0].id);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [lightboxData, setLightboxData] = useState(null);
+  const { t, i18n } = useTranslation();
+  const visibleProjects = portfolioItems.filter((p) => p.images.length > 0);
+  const tabs = categories.filter((c) => visibleProjects.some((p) => p.category === c.id));
+  const [activeTab, setActiveTab] = useState(tabs[0]?.id);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
   const [photoIndex, setPhotoIndex] = useState(0);
-  const [openFaq, setOpenFaq] = useState(null);
+  const [openFaq, setOpenFaq] = useState(1);
+  const [sent, setSent] = useState(false);
 
-  const portfolioTabs = categories.map((c) => ({ id: c.id, label: t(c.labelKey) }));
-
-  // Sekcja "Opinie" i jej link w menu pojawiają się dopiero, gdy są prawdziwe opinie.
   const hasTestimonials = testimonials.length > 0;
+  const designerPhoto = portfolioItems.find((p) => p.id === 'klobucka')?.images[11] ?? visibleProjects[0]?.src;
 
-  const openLightbox = (item) => {
-    setLightboxData(item);
-    setPhotoIndex(0);
-  };
-
-  const closeLightbox = useCallback(() => setLightboxData(null), []);
-
-  const step = useCallback((delta) => {
-    setPhotoIndex((prev) => {
-      const total = lightboxData?.images.length ?? 0;
-      if (!total) return 0;
-      return (prev + delta + total) % total;
-    });
-  }, [lightboxData]);
-
-  // Nawigacja klawiaturą w lightboxie
   useEffect(() => {
-    if (!lightboxData) return;
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language === 'ua' ? 'uk' : i18n.language;
+    document.title = t('meta.title');
+  }, [i18n.language, t]);
+
+  useEffect(() => {
+    document.body.style.overflow = lightbox || menuOpen ? 'hidden' : '';
+  }, [lightbox, menuOpen]);
+
+  const closeLightbox = useCallback(() => setLightbox(null), []);
+  const step = useCallback((d) => {
+    setPhotoIndex((prev) => {
+      const total = lightbox?.images.length ?? 0;
+      return total ? (prev + d + total) % total : 0;
+    });
+  }, [lightbox]);
+
+  useEffect(() => {
+    if (!lightbox) return;
     const onKey = (e) => {
       if (e.key === 'Escape') closeLightbox();
       if (e.key === 'ArrowRight') step(1);
@@ -122,483 +162,512 @@ export default function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [lightboxData, closeLightbox, step]);
+  }, [lightbox, closeLightbox, step]);
 
-  const packages = [
-    { id: 'minimal', price: '300', features: ['pricing.minimal_f1', 'pricing.minimal_f2'] },
-    { id: 'optimal', price: '400', popular: true, features: ['pricing.optimal_f1', 'pricing.optimal_f2', 'pricing.optimal_f3'] },
-    { id: 'maximum', price: '500', features: ['pricing.maximum_f1', 'pricing.maximum_f2'] },
-    { id: 'premium', price: null, features: ['pricing.premium_f1', 'pricing.premium_f2', 'pricing.premium_f3'] },
+  // Formularz bez backendu: składa gotowy e-mail w programie pocztowym klienta.
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    const body = [
+      `${t('contact.field_name')}: ${f.get('name')}`,
+      `${t('contact.field_email')}: ${f.get('email')}`,
+      f.get('phone') ? `${t('contact.field_phone')}: ${f.get('phone')}` : null,
+      '',
+      f.get('message'),
+    ].filter((l) => l !== null).join('\n');
+    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(t('contact.mail_subject'))}&body=${encodeURIComponent(body)}`;
+    setSent(true);
+  };
+
+  const nav = [
+    { href: '#uslugi', label: t('nav.services') },
+    { href: '#realizacje', label: t('nav.portfolio') },
+    { href: '#cennik', label: t('nav.offer') },
+    { href: '#studio', label: t('nav.studio') },
+    { href: '#kontakt', label: t('nav.contact') },
   ];
 
-  // Warunki współpracy — pełna lista z oferty
-  const terms = Array.from({ length: 10 }, (_, i) => t(`faq.t${i + 1}`));
-
-  const faqs = [
-    { q: t('faq.q1'), a: t('faq.a1') },
-    { q: t('faq.q2'), a: t('faq.a2') },
-    { q: t('faq.q3'), a: t('faq.a3') },
-    { q: t('faq.q4'), a: t('faq.a4') },
-  ];
-
-  const filteredPortfolio = portfolioItems.filter(item => item.category === activeTab);
+  const onDark = !scrolled && !menuOpen;
+  const filtered = visibleProjects.filter((p) => p.category === activeTab);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-300 font-sans selection:bg-white selection:text-black scroll-smooth">
-
-      {/* ── Navbar ── */}
-      <nav className="fixed w-full top-0 z-50 bg-neutral-950/70 backdrop-blur-xl border-b border-white/5 transition-all">
-        <div className="max-w-site mx-auto px-6 h-20 flex items-center justify-between">
-          <a href="#" className="text-sm tracking-[0.2em] text-white uppercase flex flex-col z-50">
-            <span className="font-bold">Photographer</span>
-            <span className="text-[10px] text-neutral-500">Name</span>
+    <div className="min-h-screen">
+      {/* ── Nav ── */}
+      <header
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+          onDark ? 'bg-transparent text-plaster' : 'bg-plaster/90 backdrop-blur-md text-bay border-b border-stone/70'
+        }`}
+      >
+        <div className="max-w-site mx-auto h-16 md:h-20 flex items-center justify-between gap-6">
+          <a href="#" className="text-[15px] md:text-base" aria-label={`${site.brand} ${site.brandSuffix}`}>
+            <Wordmark />
           </a>
-
-          {/* Desktop menu */}
-          <div className="hidden md:flex space-x-8 text-[11px] tracking-widest uppercase">
-            <a href="#portfolio" className="hover:text-white transition-colors">{t('nav.portfolio')}</a>
-            <a href="#o-mnie" className="hover:text-white transition-colors">{t('nav.about')}</a>
-            <a href="#oferta" className="hover:text-white transition-colors">{t('nav.offer')}</a>
-            {hasTestimonials && <a href="#opinie" className="hover:text-white transition-colors">{t('nav.reviews')}</a>}
-            <a href="#kontakt" className="hover:text-white transition-colors">{t('nav.contact')}</a>
+          <nav className="hidden lg:flex items-center gap-8 text-[13px]">
+            {nav.map((n) => (
+              <a key={n.href} href={n.href} className="opacity-80 hover:opacity-100 transition-opacity">{n.label}</a>
+            ))}
+          </nav>
+          <div className="hidden lg:flex items-center gap-8">
+            <LanguageSwitcher tone={onDark ? 'light' : 'dark'} />
+            <a href="#kontakt" className={onDark ? 'btn-light !py-2.5' : 'btn-dark !py-2.5'}>{t('nav.reserve')}</a>
           </div>
-
-          <div className="hidden md:flex items-center gap-4">
-            <LanguageSwitcher />
-            <a href="#kontakt" className="flex items-center gap-2 text-[11px] tracking-widest uppercase text-white hover:text-neutral-400 transition-colors">
-              {t('nav.reserve')} <ChevronRight size={14} />
-            </a>
-          </div>
-
-          {/* Mobile burger */}
           <button
-            className="md:hidden z-50 text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden flex items-center gap-2 text-[13px]"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            {menuOpen ? t('nav.close') : t('nav.menu')}
           </button>
         </div>
+      </header>
 
-        {/* Mobile fullscreen menu */}
-        <div className={`fixed inset-0 bg-neutral-950/95 backdrop-blur-3xl z-40 flex flex-col items-center justify-center space-y-8 transition-all duration-500 md:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-          <a href="#portfolio" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.portfolio')}</a>
-          <a href="#o-mnie" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.about')}</a>
-          <a href="#oferta" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.offer')}</a>
-          {hasTestimonials && <a href="#opinie" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.reviews')}</a>}
-          <a href="#kontakt" onClick={() => setIsMobileMenuOpen(false)} className="text-xl tracking-[0.2em] uppercase text-white hover:text-neutral-400">{t('nav.contact')}</a>
-          <LanguageSwitcher />
-          <a href="#kontakt" onClick={() => setIsMobileMenuOpen(false)} className="mt-4 px-8 py-3 border border-white text-white tracking-widest uppercase text-sm hover:bg-white hover:text-black transition-colors">
-            {t('nav.reserveBtn')}
-          </a>
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 bg-plaster pt-24 px-[4vw] flex flex-col animate-fade-in lg:hidden">
+          <nav className="flex flex-col">
+            {nav.map((n) => (
+              <a
+                key={n.href}
+                href={n.href}
+                onClick={() => setMenuOpen(false)}
+                className="font-display font-light text-3xl text-bay py-4 border-b border-stone"
+              >
+                {n.label}
+              </a>
+            ))}
+          </nav>
+          <div className="mt-auto pb-10 flex items-center justify-between">
+            <LanguageSwitcher tone="dark" />
+            <a href="#kontakt" onClick={() => setMenuOpen(false)} className="btn-dark">{t('nav.reserve')}</a>
+          </div>
         </div>
-      </nav>
+      )}
 
       {/* ── Hero ── */}
-      <section className="h-[90vh] min-h-[600px] relative flex items-center justify-center text-center px-4 pt-20">
-        <div className="absolute inset-0 bg-neutral-900 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem] mx-2 md:mx-6">
-          <img
-            src="/images/hero-bg.jpg"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/40 via-neutral-950/70 to-neutral-950 z-10" />
-        </div>
+      <section className="relative h-[100svh] min-h-[620px] bg-bay overflow-hidden">
+        <img
+          src="/images/hero-bg.jpg"
+          alt=""
+          fetchpriority="high"
+          className="absolute inset-0 w-full h-full object-cover animate-fade-in"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-bay via-bay/45 to-bay/30" />
+        <Viewfinder />
 
-        <div className="relative z-20 space-y-8 max-w-site-narrow mx-auto animate-fade-in-up">
-          <div className="text-neutral-400 tracking-[0.4em] text-[10px] md:text-xs uppercase flex items-center justify-center gap-4">
-            <span className="w-8 h-[1px] bg-neutral-600"></span>
-            {t('hero.tagline')}
-            <span className="w-8 h-[1px] bg-neutral-600"></span>
-          </div>
-          <h1 className="text-hero font-light text-white whitespace-pre-line">
+        <div className="relative z-30 h-full max-w-site mx-auto flex flex-col justify-end pb-16 md:pb-24">
+          <h1
+            className="font-display font-light text-hero text-plaster max-w-[14ch] animate-rise"
+            style={{ animationDelay: '.5s' }}
+          >
             {t('hero.title')}
           </h1>
-          <p className="text-sm md:text-base text-neutral-400 font-light max-w-lg mx-auto leading-relaxed">
-            {t('hero.subtitle')}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-            <a href="#portfolio" className="bg-white text-black px-8 py-4 rounded-full text-xs tracking-widest uppercase font-bold hover:bg-neutral-200 hover:scale-105 transition-all">
-              {t('hero.cta_portfolio')}
-            </a>
-            <a href="#oferta" className="border border-white/20 text-white px-8 py-4 rounded-full text-xs tracking-widest uppercase hover:bg-white/5 hover:border-white/40 transition-all">
-              {t('hero.cta_offer')}
-            </a>
+          <div
+            className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-end justify-between gap-8 animate-rise"
+            style={{ animationDelay: '.75s' }}
+          >
+            <p className="text-plaster/75 text-[15px] md:text-base leading-relaxed max-w-[46ch]">{t('hero.subtitle')}</p>
+            <div className="flex flex-wrap gap-3">
+              <a href="#realizacje" className="btn-light">{t('hero.cta_portfolio')}</a>
+              <a href="#cennik" className="btn-ghost-light">{t('hero.cta_offer')}</a>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── O mnie ── */}
-      <motion.section id="o-mnie" {...fadeInUp} className="py-24 md:py-32 px-6 md:px-12 2xl:px-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="relative aspect-[3/4] md:aspect-square bg-neutral-900 rounded-2xl overflow-hidden group">
-            <SmartImage
-              src="/images/about/viktoria-chernobay.webp"
-              alt="Viktoria Chernobay"
-              className="absolute inset-0 w-full h-full"
-            />
-          </div>
-          <div className="space-y-8">
-            <div className="text-[10px] tracking-widest text-neutral-500 uppercase">{t('about.label')}</div>
-            <h2 className="text-display font-light text-white leading-tight whitespace-pre-line">
-              {t('about.title')}
-            </h2>
-            <div className="space-y-4 text-sm text-neutral-400 font-light leading-relaxed">
-              <p>{t('about.p1')}</p>
-              <p>{t('about.p2')}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/10">
-              <div>
-                <div className="text-3xl text-white font-light mb-2">{t('about.stat1_value')}</div>
-                <div className="text-[10px] tracking-widest text-neutral-500 uppercase">{t('about.stat1_label')}</div>
+      {/* ── Intro ── */}
+      <section className="bg-plaster py-20 md:py-32">
+        <div className="max-w-site mx-auto grid lg:grid-cols-12 gap-12">
+          <p className="lg:col-span-9 font-display font-light text-lead text-bay">{t('intro.statement')}</p>
+          <dl className="lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-px bg-stone border-y border-stone mt-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-plaster py-6 sm:pr-6">
+                <dt className="font-display font-light text-3xl md:text-4xl text-bay">{t(`intro.fact${i}_value`)}</dt>
+                <dd className="mt-2 text-[14px] text-graphite/80">{t(`intro.fact${i}_label`)}</dd>
               </div>
-              <div>
-                <div className="text-3xl text-white font-light mb-2">{t('about.stat2_value')}</div>
-                <div className="text-[10px] tracking-widest text-neutral-500 uppercase">{t('about.stat2_label')}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* ── Portfolio ── */}
-      <motion.section id="portfolio" {...fadeInUp} className="py-24 md:py-32 overflow-hidden bg-neutral-900/30">
-        <div className="px-6 md:px-12 2xl:px-16 max-w-site mx-auto mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div>
-            <h2 className="text-display font-light text-white mb-4">{t('portfolio.title')}</h2>
-            <p className="text-sm text-neutral-500 font-light max-w-sm">{t('portfolio.subtitle')}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-6 text-[11px] tracking-[0.2em] uppercase">
-            {portfolioTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`pb-2 transition-all duration-300 ${activeTab === tab.id ? 'text-white border-b border-white' : 'text-neutral-600 hover:text-neutral-300'}`}
-              >
-                {tab.label}
-              </button>
             ))}
-          </div>
+          </dl>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-8 px-6 md:px-12 2xl:px-16 max-w-site mx-auto">
-          {filteredPortfolio.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              onClick={() => openLightbox(item)}
-              className={`relative group overflow-hidden rounded-xl bg-neutral-900 cursor-pointer ${item.aspect}`}
-            >
-              <SmartImage
-                src={item.src}
-                alt={item.title}
-                className="absolute inset-0 w-full h-full group-hover:scale-105 transition-transform duration-700"
-              />
-
-              {/* Licznik zdjęć w galerii */}
-              {/* Na dotyku nie ma hovera — na małych ekranach opis jest widoczny od razu. */}
-              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm text-white/90 text-[10px] tracking-widest px-2.5 py-1 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500">
-                <ImageIcon size={11} strokeWidth={1.5} /> {item.images.length}
-              </div>
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8">
-                <div className="transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500">
-                  <div className="flex items-center gap-2 text-neutral-400 text-[10px] tracking-widest uppercase mb-2">
-                    <Building size={12} /> {item.type}
-                  </div>
-                  <h3 className="text-white text-xl font-light mb-1">{item.title}</h3>
-                  <p className="text-neutral-400 text-xs">
-                    {[item.size, item.location, item.year].filter(Boolean).join(' • ')}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+      {/* ── Usługi ── */}
+      <section id="uslugi" aria-labelledby="uslugi-h" className="bg-paper py-20 md:py-28">
+        <div className="max-w-site mx-auto">
+          <SectionHead id="uslugi-h" title={t('services.title')} subtitle={t('services.subtitle')} />
+          <ul className="border-t border-bay/80">
+            {services.map((s) => (
+              <li key={s} className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-2 py-7 md:py-9 border-b border-stone">
+                <h3 className="md:col-span-4 font-display font-normal text-xl md:text-2xl text-bay tracking-[-0.01em]">
+                  {t(`services.${s}_name`)}
+                </h3>
+                <p className="md:col-span-5 text-[15px] leading-relaxed text-graphite">{t(`services.${s}_desc`)}</p>
+                <p className="md:col-span-3 text-[13px] text-mist md:text-right">
+                  <span className="sr-only">{t('services.by_label')}: </span>
+                  {t(`services.${s}_by`)}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
-      </motion.section>
+      </section>
 
-      {/* ── Lightbox ── */}
-      {lightboxData && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 md:p-12 animate-fade-in">
-          <button onClick={closeLightbox} className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-10">
-            <X size={32} />
-          </button>
-
-          <div className="max-w-5xl w-full h-full flex flex-col items-center justify-center">
-            <div className="relative w-full max-h-[52vh] sm:max-h-[62vh] md:max-h-[70vh] aspect-[4/3] bg-neutral-900 flex items-center justify-center rounded-lg overflow-hidden">
-              <SmartImage
-                key={photoIndex}
-                src={lightboxData.images[photoIndex]}
-                alt={`${lightboxData.title} — ${photoIndex + 1}`}
-                fit="contain"
-                className="w-full h-full animate-fade-in"
-              />
-
-              {lightboxData.images.length > 1 && (
-                <>
+      {/* ── Realizacje ── */}
+      <section id="realizacje" aria-labelledby="realizacje-h" className="bg-plaster py-20 md:py-28">
+        <div className="max-w-site mx-auto">
+          <SectionHead id="realizacje-h" title={t('portfolio.title')} subtitle={t('portfolio.subtitle')}>
+            {tabs.length > 1 && (
+              <div role="tablist" className="flex flex-wrap gap-2">
+                {tabs.map((tab) => (
                   <button
-                    onClick={() => step(-1)}
-                    aria-label="Poprzednie zdjęcie"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/70 flex items-center justify-center transition-all"
+                    key={tab.id}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2 text-[13px] rounded-[2px] border transition-colors ${
+                      activeTab === tab.id ? 'bg-bay text-plaster border-bay' : 'border-stone text-graphite hover:border-bay'
+                    }`}
                   >
-                    <ChevronLeft size={22} />
-                  </button>
-                  <button
-                    onClick={() => step(1)}
-                    aria-label="Następne zdjęcie"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/70 flex items-center justify-center transition-all"
-                  >
-                    <ChevronRight size={22} />
-                  </button>
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white/80 text-[11px] tracking-widest px-3 py-1 rounded-full">
-                    {photoIndex + 1} / {lightboxData.images.length}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Miniatury */}
-            {lightboxData.images.length > 1 && (
-              <div className="flex gap-2 mt-4 overflow-x-auto max-w-full pb-1">
-                {lightboxData.images.map((img, i) => (
-                  <button
-                    key={img}
-                    onClick={() => setPhotoIndex(i)}
-                    className={`shrink-0 w-12 h-9 sm:w-16 sm:h-12 rounded overflow-hidden border transition-all ${i === photoIndex ? 'border-white opacity-100' : 'border-transparent opacity-40 hover:opacity-75'}`}
-                  >
-                    <SmartImage src={img} alt="" className="w-full h-full" />
+                    {t(tab.labelKey)}
                   </button>
                 ))}
               </div>
             )}
+          </SectionHead>
 
-            <div className="mt-5 md:mt-8 text-center">
-              <h3 className="text-xl md:text-2xl font-light text-white mb-2">{lightboxData.title}</h3>
-              <div className="flex gap-4 justify-center text-sm text-neutral-400">
-                {[lightboxData.type, lightboxData.size, lightboxData.location, lightboxData.year]
-                  .filter(Boolean)
-                  .map((val, i, arr) => (
-                    <React.Fragment key={val}>
-                      <span>{val}</span>
-                      {i < arr.length - 1 && <span>•</span>}
-                    </React.Fragment>
-                  ))}
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+            {filtered.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setLightbox(item); setPhotoIndex(0); }}
+                className="group text-left"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden bg-stone/40">
+                  <SmartImage
+                    src={item.src}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="mt-4 flex items-baseline justify-between gap-4">
+                  <h3 className="font-display font-normal text-lg text-bay">{item.title}</h3>
+                  <span className="text-[13px] text-mist shrink-0">{t('portfolio.photos', { count: item.images.length })}</span>
+                </div>
+                <p className="mt-1 text-[13px] text-graphite/80">
+                  {[item.type, item.size, item.location, item.year].filter(Boolean).join(', ')}
+                </p>
+              </button>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Lightbox ── */}
+      {lightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightbox.title}
+          className="fixed inset-0 z-[100] bg-bay flex flex-col animate-fade-in"
+        >
+          <div className="max-w-site w-full mx-auto h-16 flex items-center justify-between text-plaster">
+            <div className="text-[14px]">
+              <span className="font-display">{lightbox.title}</span>
+              <span className="text-plaster/50 ml-3">{photoIndex + 1} / {lightbox.images.length}</span>
+            </div>
+            <button onClick={closeLightbox} aria-label={t('portfolio.close')} className="p-2 -mr-2 text-plaster/70 hover:text-plaster">
+              <X size={24} />
+            </button>
+          </div>
+          <div className="relative flex-1 min-h-0 px-[4vw] pb-4">
+            <SmartImage
+              key={photoIndex}
+              src={lightbox.images[photoIndex]}
+              alt={`${lightbox.title}, ${photoIndex + 1}`}
+              fit="contain"
+              eager
+              className="w-full h-full animate-fade-in"
+            />
+            {lightbox.images.length > 1 && (
+              <>
+                <button onClick={() => step(-1)} aria-label={t('portfolio.prev')}
+                  className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center bg-bay/70 text-plaster hover:bg-bay">
+                  <ChevronLeft size={22} />
+                </button>
+                <button onClick={() => step(1)} aria-label={t('portfolio.next')}
+                  className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center bg-bay/70 text-plaster hover:bg-bay">
+                  <ChevronRight size={22} />
+                </button>
+              </>
+            )}
+          </div>
+          {lightbox.images.length > 1 && (
+            <div className="max-w-site w-full mx-auto flex gap-2 overflow-x-auto pb-5">
+              {lightbox.images.map((img, i) => (
+                <button
+                  key={img}
+                  onClick={() => setPhotoIndex(i)}
+                  aria-label={`${i + 1}`}
+                  className={`shrink-0 w-16 h-11 overflow-hidden transition-opacity ${i === photoIndex ? 'opacity-100 ring-1 ring-brass-light' : 'opacity-40 hover:opacity-80'}`}
+                >
+                  <SmartImage src={img} alt="" className="w-full h-full" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* ── Oferta ── */}
-      <motion.section id="oferta" {...fadeInUp} className="py-24 px-6 md:px-12 2xl:px-16 bg-neutral-900/50">
+      {/* ── Jak pracujemy ── */}
+      <section aria-labelledby="proces-h" className="bg-bay text-plaster py-20 md:py-28">
         <div className="max-w-site mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-display font-light text-white mb-4">{t('pricing.title')}</h2>
-            <p className="text-sm text-neutral-500 font-light">{t('pricing.subtitle')}</p>
-          </div>
+          <SectionHead id="proces-h" title={t('process.title')} tone="light" />
+          <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+            {processSteps.map((s, i) => (
+              <li key={s} className="border-t border-bay-line pt-6">
+                <span className="font-display font-light text-5xl text-brass-light">{i + 1}</span>
+                <h3 className="mt-6 font-display text-lg">{t(`process.${s}_name`)}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-plaster/65">{t(`process.${s}_desc`)}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            {packages.map((pkg) => (
+      {/* ── Cennik ── */}
+      <section id="cennik" aria-labelledby="cennik-h" className="bg-paper py-20 md:py-28">
+        <div className="max-w-site mx-auto">
+          <SectionHead id="cennik-h" title={t('pricing.title')} subtitle={t('pricing.subtitle')} />
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 border-t border-bay/80">
+            {packages.map((p) => (
               <div
-                key={pkg.id}
-                className={`p-8 rounded-2xl transition-colors flex flex-col relative group ${
-                  pkg.popular
-                    ? 'bg-neutral-900 border border-neutral-700 hover:border-neutral-500 shadow-2xl lg:-translate-y-4'
-                    : 'bg-neutral-950 border border-white/5 hover:border-white/20'
+                key={p.id}
+                className={`relative flex flex-col p-6 md:p-8 border-b border-stone lg:border-b-0 lg:[&:not(:last-child)]:border-r ${
+                  p.popular ? 'bg-bay text-plaster border-bay' : 'text-bay'
                 }`}
               >
-                {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-1 rounded-full text-[10px] tracking-widest uppercase font-bold whitespace-nowrap">
+                {p.popular && (
+                  <span className="absolute top-0 right-0 bg-brass text-bay text-[12px] font-medium px-3 py-1">
                     {t('pricing.popular')}
-                  </div>
+                  </span>
                 )}
+                <h3 className="font-display text-2xl">{t(`pricing.${p.id}`, { defaultValue: p.id[0].toUpperCase() + p.id.slice(1) })}</h3>
+                <p className={`mt-1 text-[14px] ${p.popular ? 'text-plaster/60' : 'text-mist'}`}>{t(`pricing.${p.id}_area`)}</p>
 
-                <div className={`text-[10px] tracking-widest uppercase mb-4 ${pkg.popular ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                  {t(`pricing.${pkg.id}_label`)}
-                </div>
-                <h3 className="text-2xl text-white font-light mb-2">{t(`pricing.${pkg.id}_name`)}</h3>
-
-                <div className="text-4xl font-light text-white mb-8 group-hover:scale-105 transition-transform origin-left">
-                  {pkg.price ? (
-                    <>{pkg.price} <span className="text-lg text-neutral-600">PLN</span></>
+                <div className="mt-8 mb-6 min-h-[3.5rem] flex items-end">
+                  {p.price ? (
+                    <p className="font-display font-light text-5xl tracking-[-0.03em]">
+                      {pln(p.price)}<span className="text-base ml-2 opacity-60">PLN</span>
+                    </p>
                   ) : (
-                    <span className="text-2xl text-neutral-300">{t('pricing.custom_quote')}</span>
+                    <p className="font-display font-light text-2xl leading-tight">{t('pricing.custom_quote')}</p>
                   )}
                 </div>
 
-                <ul className="space-y-4 text-sm font-light flex-1">
-                  {pkg.features.map((key) => (
-                    <li key={key} className={`flex gap-3 ${pkg.popular ? 'text-white' : ''}`}>
-                      <CheckCircle2 size={18} className={`shrink-0 ${pkg.popular ? 'text-white' : 'text-neutral-600'}`} />
-                      {t(key)}
-                    </li>
-                  ))}
-                </ul>
+                <p className={`text-[15px] font-medium ${p.popular ? '' : 'text-bay'}`}>
+                  {p.photos ? t('pricing.photos', { count: p.photos }) : t('pricing.photos_custom')}
+                </p>
+                <p className={`mt-2 text-[14px] leading-relaxed flex-1 ${p.popular ? 'text-plaster/70' : 'text-graphite/85'}`}>
+                  {t(`pricing.${p.id}_desc`)}
+                </p>
+
+                <a href="#kontakt" className={`mt-8 ${p.popular ? 'btn-light' : 'btn-ghost-dark'}`}>
+                  {p.price ? t('pricing.book') : t('pricing.ask')}
+                </a>
               </div>
             ))}
           </div>
 
-          <p className="text-center text-[10px] tracking-widest uppercase text-neutral-600 mb-6">
-            {t('pricing.netto')}
-          </p>
+          {/* Dodatki */}
+          <div className="mt-16 grid lg:grid-cols-12 gap-8">
+            <h3 className="lg:col-span-3 font-display text-xl text-bay">{t('pricing.extras_title')}</h3>
+            <ul className="lg:col-span-9 border-t border-stone">
+              {[1, 2, 3, 4].map((i) => (
+                <li key={i} className="flex justify-between gap-6 py-4 border-b border-stone text-[15px]">
+                  <span className="text-graphite">{t(`pricing.extra${i}`)}</span>
+                  <span className="text-bay font-medium shrink-0 text-right">{t(`pricing.extra${i}_price`)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          {/* Designer Day */}
-          <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 mt-6 overflow-hidden relative">
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="flex-1 relative z-10">
-              <div className="inline-block border border-white/20 text-white text-[10px] tracking-widest uppercase px-3 py-1 rounded-full mb-6">
-                {t('pricing.designer_badge')}
-              </div>
-              <h3 className="text-3xl md:text-4xl font-light text-white mb-4">{t('pricing.designer_name')}</h3>
-              <ul className="text-neutral-400 font-light text-sm max-w-md space-y-3">
-                {['designer_f1', 'designer_f2', 'designer_f3'].map((k) => (
-                  <li key={k} className="flex gap-3">
-                    <CheckCircle2 size={18} className="text-neutral-600 shrink-0 mt-0.5" />
-                    {t(`pricing.${k}`)}
-                  </li>
-                ))}
-              </ul>
+          {/* Agencje + Designer Day */}
+          <div className="mt-16 grid lg:grid-cols-2 gap-6">
+            <div className="bg-bay text-plaster p-8 md:p-12 flex flex-col">
+              <p className="text-[13px] text-brass-light">{t('pricing.agency_label')}</p>
+              <h3 className="mt-4 font-display font-light text-3xl md:text-4xl">{t('pricing.agency_title')}</h3>
+              <p className="mt-5 text-[15px] leading-relaxed text-plaster/70 max-w-prose flex-1">{t('pricing.agency_desc')}</p>
+              <a href="#kontakt" className="btn-light mt-10 self-start">{t('pricing.agency_cta')}</a>
             </div>
-            <div className="text-left md:text-right shrink-0 w-full md:w-auto relative z-10">
-              <div className="text-5xl font-light text-white mb-2">500 <span className="text-xl">PLN*</span></div>
-              <p className="text-[10px] tracking-widest text-neutral-500 uppercase">{t('pricing.designer_note')}</p>
-              <a href="#kontakt" className="inline-block mt-6 w-full md:w-auto bg-white text-black px-8 py-3 text-xs tracking-widest uppercase rounded-full font-bold hover:bg-neutral-200 transition-colors text-center">
-                {t('pricing.designer_cta')}
-              </a>
+
+            <div className="bg-plaster grid sm:grid-cols-2">
+              <div className="relative min-h-[240px] sm:min-h-0">
+                <SmartImage src={designerPhoto} alt="" className="absolute inset-0 w-full h-full" />
+              </div>
+              <div className="p-8 md:p-10 flex flex-col">
+                <p className="text-[13px] text-brass">{t('pricing.designer_label')}</p>
+                <h3 className="mt-4 font-display font-light text-3xl text-bay">{t('pricing.designer_name')}</h3>
+                <p className="mt-4 text-[14px] leading-relaxed text-graphite flex-1">{t('pricing.designer_desc')}</p>
+                <p className="mt-6 font-display font-light text-4xl text-bay">
+                  {pln(designerDayPrice)}<span className="text-base ml-2 opacity-60">PLN*</span>
+                </p>
+                <p className="mt-2 text-[12px] text-mist">{t('pricing.designer_note')}</p>
+                <a href="#kontakt" className="btn-dark mt-6 self-start">{t('pricing.designer_cta')}</a>
+              </div>
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* ── Opinie — renderuje się tylko, gdy są prawdziwe opinie ── */}
+      {/* ── Studio ── */}
+      <section id="studio" aria-labelledby="studio-h" className="bg-plaster py-20 md:py-28">
+        <div className="max-w-site mx-auto grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          <figure className="lg:col-span-5">
+            <div className="relative aspect-[4/5] overflow-hidden bg-stone/40">
+              <SmartImage src="/images/about/viktoria-chernobay.webp" alt={site.founder} className="absolute inset-0 w-full h-full" />
+            </div>
+            <figcaption className="mt-4 flex justify-between gap-4 text-[14px]">
+              <span className="font-display text-bay">{site.founder}</span>
+              <span className="text-mist">{t('studio.role')}</span>
+            </figcaption>
+          </figure>
+
+          <div className="lg:col-span-7 lg:pt-4">
+            <h2 id="studio-h" className="font-display font-light text-display text-bay">{t('studio.title')}</h2>
+            <div className="mt-8 space-y-5 text-[16px] leading-[1.7] text-graphite max-w-prose">
+              <p>{t('studio.p1')}</p>
+              <p>{t('studio.p2')}</p>
+            </div>
+
+            <h3 className="mt-14 font-display text-lg text-bay">{t('studio.team_title')}</h3>
+            <dl className="mt-5 border-t border-bay/80">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="grid grid-cols-2 gap-6 py-4 border-b border-stone text-[15px]">
+                  <dt className="text-graphite">{t(`studio.team${i}_role`)}</dt>
+                  <dd className="text-bay font-medium">{t(`studio.team${i}_who`)}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Opinie — tylko gdy są prawdziwe ── */}
       {hasTestimonials && (
-      <motion.section id="opinie" {...fadeInUp} className="py-24 px-6 md:px-12 2xl:px-16 bg-neutral-950">
-        <div className="max-w-site mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-display font-light text-white mb-4">{t('reviews.title')}</h2>
-            <p className="text-sm text-neutral-500 font-light">{t('reviews.subtitle')}</p>
+        <section aria-labelledby="opinie-h" className="bg-paper py-20 md:py-28">
+          <div className="max-w-site mx-auto">
+            <SectionHead id="opinie-h" title={t('reviews.title')} />
+            <div className="grid md:grid-cols-3 gap-10">
+              {testimonials.map((r) => (
+                <figure key={r.id} className="border-t border-bay/80 pt-6">
+                  <blockquote className="text-[16px] leading-relaxed text-graphite">“{r.text}”</blockquote>
+                  <figcaption className="mt-6 text-[14px]">
+                    <span className="block text-bay font-medium">{r.name}</span>
+                    <span className="text-mist">{r.role}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="bg-neutral-900 border border-white/5 p-8 rounded-2xl flex flex-col relative">
-                <div className="flex gap-1 mb-6 text-yellow-500">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
-                </div>
-                <p className="text-sm text-neutral-300 font-light leading-relaxed mb-8 flex-1 italic">"{testimonial.text}"</p>
-                <div className="border-t border-white/5 pt-6 mt-auto">
-                  <div className="text-white text-sm font-medium">{testimonial.name}</div>
-                  <div className="text-neutral-500 text-[10px] tracking-wider uppercase mt-1">{testimonial.role}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
+        </section>
       )}
 
-      {/* ── FAQ ── */}
-      <motion.section {...fadeInUp} className="py-24 px-6 md:px-12 2xl:px-16 border-t border-white/5 bg-neutral-900/30">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-sm tracking-[0.2em] uppercase text-white mb-12 text-center">{t('faq.title')}</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div key={index} className="border border-white/10 bg-neutral-950 rounded-xl overflow-hidden transition-all duration-300">
-                <button
-                  className="w-full flex justify-between items-center p-6 text-left focus:outline-none"
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                >
-                  <span className="text-white text-sm font-light">{faq.q}</span>
-                  {openFaq === index ? <ChevronUp size={18} className="text-neutral-500" /> : <ChevronDown size={18} className="text-neutral-500" />}
-                </button>
-                <div className={`px-6 text-sm text-neutral-400 font-light overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-                  {faq.a}
-                </div>
-              </div>
-            ))}
+      {/* ── FAQ + warunki ── */}
+      <section aria-labelledby="faq-h" className="bg-paper py-20 md:py-28 border-t border-stone">
+        <div className="max-w-site mx-auto grid lg:grid-cols-12 gap-14">
+          <div className="lg:col-span-7">
+            <h2 id="faq-h" className="font-display font-light text-display text-bay mb-10">{t('faq.title')}</h2>
+            <div className="border-t border-bay/80">
+              {[1, 2, 3, 4].map((i) => {
+                const open = openFaq === i;
+                return (
+                  <div key={i} className="border-b border-stone">
+                    <button
+                      className="w-full flex justify-between items-center gap-6 py-6 text-left"
+                      onClick={() => setOpenFaq(open ? null : i)}
+                      aria-expanded={open}
+                    >
+                      <span className="font-display text-[17px] text-bay">{t(`faq.q${i}`)}</span>
+                      {open ? <Minus size={18} className="text-brass shrink-0" /> : <Plus size={18} className="text-mist shrink-0" />}
+                    </button>
+                    {open && <p className="pb-6 -mt-1 text-[15px] leading-relaxed text-graphite max-w-prose animate-fade-in">{t(`faq.a${i}`)}</p>}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-
-          {/* Warunki współpracy */}
-          <div className="border border-white/10 bg-neutral-950 rounded-xl p-6 md:p-8 mt-8">
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white mb-6">{t('faq.terms_title')}</p>
-            <ul className="space-y-4 text-sm text-neutral-400 font-light">
-              {terms.map((term, i) => (
-                <li key={i} className="flex gap-3 leading-relaxed">
-                  <span className="text-neutral-700 shrink-0 select-none">—</span>
-                  {term}
+          <div className="lg:col-span-5">
+            <h3 className="font-display text-lg text-bay lg:mt-[5.25rem]">{t('faq.terms_title')}</h3>
+            <ul className="mt-5 space-y-3 text-[14px] leading-relaxed text-graphite/90">
+              {Array.from({ length: 8 }, (_, i) => (
+                <li key={i} className="pl-4 relative">
+                  <span className="absolute left-0 top-[0.7em] w-1.5 h-px bg-brass" aria-hidden="true" />
+                  {t(`faq.t${i + 1}`)}
                 </li>
               ))}
             </ul>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* ── Kontakt ── */}
-      <motion.section id="kontakt" {...fadeInUp} className="pt-24 pb-12 px-6 md:px-12 2xl:px-16 bg-neutral-900 rounded-t-[3rem] md:rounded-t-[6rem] mx-2 md:mx-6 mb-2">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
-            <div className="space-y-8">
-              <div className="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mb-8">
-                <Camera size={24} className="text-white" />
-              </div>
-              <h2 className="text-4xl md:text-6xl font-light text-white tracking-tight leading-tight">
-                {t('contact.title')}
-              </h2>
-              <p className="text-neutral-400 font-light max-w-sm">{t('contact.subtitle')}</p>
-
-              <div className="space-y-4 pt-8 border-t border-white/10 text-sm tracking-wider font-light">
-                <a href="mailto:hello@fotograf.pl" className="flex items-center gap-4 text-neutral-400 hover:text-white transition-colors">
-                  <Mail size={18} className="text-neutral-600" />hello@fotograf.pl
+      <section id="kontakt" aria-labelledby="kontakt-h" className="bg-bay text-plaster pt-20 md:pt-28 pb-10">
+        <div className="max-w-site mx-auto">
+          <div className="grid lg:grid-cols-12 gap-14">
+            <div className="lg:col-span-5">
+              <h2 id="kontakt-h" className="font-display font-light text-display">{t('contact.title')}</h2>
+              <p className="mt-5 text-[15px] leading-relaxed text-plaster/65 max-w-[40ch]">{t('contact.subtitle')}</p>
+              <div className="mt-10 space-y-4 text-[15px]">
+                <a href={`mailto:${site.email}`} className="flex items-center gap-3 hover:text-brass-light transition-colors">
+                  <Mail size={18} className="text-plaster/50" />{site.email}
                 </a>
-                <a href="#" className="flex items-center gap-4 text-neutral-400 hover:text-white transition-colors">
-                  <Instagram size={18} className="text-neutral-600" />@twoj_instagram
-                </a>
+                {site.phone && (
+                  <a href={`tel:${site.phone.replace(/\s/g, '')}`} className="flex items-center gap-3 hover:text-brass-light transition-colors">
+                    <Phone size={18} className="text-plaster/50" />{site.phone}
+                  </a>
+                )}
+                {site.instagram && (
+                  <a href={`https://instagram.com/${site.instagram}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-brass-light transition-colors">
+                    <Instagram size={18} className="text-plaster/50" />@{site.instagram}
+                  </a>
+                )}
               </div>
             </div>
 
-            <div className="bg-neutral-950 p-8 rounded-3xl border border-white/5">
-              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                <div>
-                  <label className="block text-[10px] tracking-widest text-neutral-500 uppercase mb-2">{t('contact.field_name')}</label>
-                  <input type="text" placeholder={t('contact.field_name_ph')} className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-white/30 focus:outline-none transition-colors" required />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[10px] tracking-widest text-neutral-500 uppercase mb-2">{t('contact.field_email')}</label>
-                    <input type="email" placeholder={t('contact.field_email_ph')} className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-white/30 focus:outline-none transition-colors" required />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] tracking-widest text-neutral-500 uppercase mb-2">{t('contact.field_phone')}</label>
-                    <input type="tel" placeholder={t('contact.field_phone_ph')} className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-white/30 focus:outline-none transition-colors" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[10px] tracking-widest text-neutral-500 uppercase mb-2">{t('contact.field_message')}</label>
-                  <textarea rows="4" placeholder={t('contact.field_message_ph')} className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-white/30 focus:outline-none transition-colors resize-none" required></textarea>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <input type="checkbox" id="rodo" className="mt-1" required />
-                  <label htmlFor="rodo" className="text-xs text-neutral-500 font-light leading-snug">{t('contact.rodo')}</label>
-                </div>
-
-                <button type="submit" className="w-full bg-white text-black py-4 rounded-xl text-xs tracking-widest uppercase font-bold hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2">
-                  {t('contact.submit')} <ArrowRight size={16} />
-                </button>
-              </form>
-            </div>
+            <form className="lg:col-span-6 lg:col-start-7 space-y-8" onSubmit={onSubmit}>
+              <label className="block">
+                <span className="text-[13px] text-plaster/60">{t('contact.field_name')}</span>
+                <input name="name" type="text" placeholder={t('contact.field_name_ph')} className="field" required />
+              </label>
+              <div className="grid sm:grid-cols-2 gap-8">
+                <label className="block">
+                  <span className="text-[13px] text-plaster/60">{t('contact.field_email')}</span>
+                  <input name="email" type="email" placeholder={t('contact.field_email_ph')} className="field" required />
+                </label>
+                <label className="block">
+                  <span className="text-[13px] text-plaster/60">{t('contact.field_phone')}</span>
+                  <input name="phone" type="tel" placeholder={t('contact.field_phone_ph')} className="field" />
+                </label>
+              </div>
+              <label className="block">
+                <span className="text-[13px] text-plaster/60">{t('contact.field_message')}</span>
+                <textarea name="message" rows="3" placeholder={t('contact.field_message_ph')} className="field resize-none" required />
+              </label>
+              <label className="flex items-start gap-3 text-[13px] text-plaster/55 leading-snug">
+                <input type="checkbox" required className="mt-0.5 accent-[#A8844C]" />
+                {t('contact.rodo')}
+              </label>
+              <button type="submit" className="btn-light w-full sm:w-auto">{t('contact.submit')}</button>
+              {sent && <p role="status" className="text-[14px] text-brass-light">{t('contact.sent')}</p>}
+            </form>
           </div>
 
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] tracking-widest uppercase text-neutral-600">
-            <p>{t('footer.rights')}</p>
-            <p>{t('footer.tagline')}</p>
-          </div>
+          <footer className="mt-24 pt-8 border-t border-bay-line flex flex-col md:flex-row justify-between gap-4 text-[13px] text-plaster/50">
+            <Wordmark className="text-plaster text-[15px]" />
+            <span>{t('footer.tagline')}</span>
+            <span>{t('footer.rights', { year: new Date().getFullYear() })}</span>
+          </footer>
         </div>
-      </motion.section>
+      </section>
     </div>
   );
 }

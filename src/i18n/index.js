@@ -4,7 +4,8 @@ import pl from './locales/pl.json';
 import en from './locales/en.json';
 import ua from './locales/ua.json';
 
-const savedLang = localStorage.getItem('lang') || 'pl';
+let savedLang = 'pl';
+try { savedLang = localStorage.getItem('lang') || 'pl'; } catch { /* prywatne okno */ }
 
 i18n.use(initReactI18next).init({
   resources: {
